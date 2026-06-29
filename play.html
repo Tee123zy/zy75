@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZEAL — Places</title>
+  <style>
+    :root { --paper:#11100f; --line:rgba(255,184,63,.45); --glow:#f5a22a; }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      min-width:320px;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(242,146,30,.18), transparent 42%),
+        #0b0b0a;
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    .game-shell {
+      width:min(1440px, calc(100% - 44px));
+      min-height:100vh;
+      margin:0 auto;
+      padding:22px 0;
+    }
+    .game-shell[hidden] { display:none; }
+    .game-intro, .game-result {
+      position:fixed;
+      inset:0;
+      z-index:7;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      background:radial-gradient(circle at 50% 22%, rgba(242,146,30,.22), transparent 38%), rgba(8,8,7,.96);
+    }
+    .game-intro[hidden], .game-result[hidden] { display:none; }
+    .intro-card {
+      width:min(560px, 100%);
+      padding:clamp(28px, 5vw, 58px);
+      border:1px solid var(--line);
+      background:linear-gradient(145deg, rgba(40,30,20,.92), rgba(12,12,11,.97));
+      color:#f8e5c2;
+      box-shadow:0 28px 80px rgba(0,0,0,.58), inset 0 0 42px rgba(245,162,42,.06);
+      text-align:center;
+    }
+    .intro-kicker { margin:0 0 12px; color:#e9a844; font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; }
+    .intro-card h1 { margin:0; font:400 clamp(35px, 7vw, 64px)/.95 Georgia,serif; letter-spacing:.03em; }
+    .intro-card > p:not(.intro-kicker) { max-width:400px; margin:18px auto 26px; color:#e8d7bb; font-size:15px; line-height:1.65; }
+    .rule-list { display:grid; gap:10px; margin:0 0 28px; padding:0; list-style:none; text-align:left; }
+    .rule-list li { display:flex; gap:12px; align-items:flex-start; padding:11px 0; border-top:1px solid rgba(255,184,63,.2); color:#eddcc1; font-size:13px; line-height:1.5; }
+    .rule-list b { flex:0 0 auto; color:#f5a22a; font:400 20px/1 Georgia,serif; }
+    .start-button, .restart-button {
+      padding:15px 23px;
+      border:1px solid #ffd281;
+      background:#f0a033;
+      color:#17110a;
+      font:800 12px/1 Arial,Helvetica,sans-serif;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      cursor:pointer;
+      transition:transform .2s ease, background .2s ease;
+    }
+    .start-button:hover, .start-button:focus-visible, .restart-button:hover, .restart-button:focus-visible { transform:translateY(-3px); background:#ffd281; outline:0; }
+    .scoreboard {
+      position:sticky;
+      top:14px;
+      z-index:5;
+      width:max-content;
+      min-width:142px;
+      margin:0 0 14px auto;
+      padding:10px 15px 11px;
+      border:1px solid var(--line);
+      background:rgba(17,16,15,.88);
+      box-shadow:0 10px 28px rgba(0,0,0,.32);
+      color:#f8e5c2;
+      backdrop-filter:blur(12px);
+    }
+    .scoreboard span {
+      display:block;
+      color:#e9a844;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .scoreboard strong {
+      display:block;
+      margin-top:2px;
+      font-family:Georgia,serif;
+      font-size:25px;
+      font-weight:400;
+      letter-spacing:.06em;
+    }
+    .scoreboard .time-value { color:#ffd281; }
+    .back-button {
+      position:fixed;
+      top:22px;
+      left:22px;
+      z-index:8;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border:1px solid var(--line);
+      background:rgba(17,16,15,.88);
+      color:#f8e5c2;
+      font:700 11px/1 Arial,Helvetica,sans-serif;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      cursor:pointer;
+      backdrop-filter:blur(12px);
+      transition:transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .back-button:hover, .back-button:focus-visible {
+      transform:translateX(-3px);
+      border-color:#ffd281;
+      background:#211a12;
+      outline:0;
+    }
+    .place-wall {
+      width:min(1440px, calc(100% - 44px));
+      width:100%;
+      margin:0;
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0, 1fr));
+      align-items:start;
+      gap:clamp(8px, 1vw, 16px);
+    }
+    .place-card {
+      position:relative;
+      display:block;
+      aspect-ratio:3 / 4;
+      min-width:0;
+      min-height:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#1a1815;
+      box-shadow:0 10px 24px rgba(0,0,0,.34);
+      cursor:pointer;
+      isolation:isolate;
+      perspective:1000px;
+      transform-style:preserve-3d;
+      -webkit-tap-highlight-color:transparent;
+      transition:transform .26s cubic-bezier(.2,.75,.2,1), box-shadow .26s ease, border-color .26s ease;
+    }
+    .place-card:hover, .place-card:focus-visible {
+      z-index:1;
+      transform:translateY(-6px) scale(1.02);
+      border-color:#ffd281;
+      box-shadow:0 18px 34px rgba(0,0,0,.54), 0 0 22px rgba(245,162,42,.2);
+      outline:0;
+    }
+    .place-card:active { transform:scale(.98); }
+    .place-card.is-selected {
+      z-index:2;
+      transform:translateY(-4px) scale(1.025);
+      border-color:#ffd281;
+      box-shadow:0 0 0 3px rgba(245,162,42,.24), 0 20px 34px rgba(0,0,0,.55);
+    }
+.place-card.is-matched {
+  pointer-events:none;
+  z-index:3;
+  animation:match-and-leave .88s cubic-bezier(.2,.68,.22,1) forwards;
+}
+    .place-card.is-matched::before {
+      content:"";
+      position:absolute;
+      z-index:4;
+      inset:-35%;
+      pointer-events:none;
+      background:radial-gradient(circle, rgba(255,249,214,.98) 0%, rgba(255,201,86,.84) 23%, rgba(245,143,20,.3) 48%, transparent 71%);
+      mix-blend-mode:screen;
+  animation:match-flare .88s ease-out forwards;
+    }
+    .place-card img {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      z-index:1;
+      backface-visibility:hidden;
+      transform:rotateY(180deg);
+      transition:transform .48s cubic-bezier(.2,.75,.2,1), filter .35s ease;
+    }
+    .place-card.is-selected img { transform:rotateY(0deg); }
+    .place-card.is-selected:hover img, .place-card.is-selected:focus-visible img { filter:saturate(1.12) contrast(1.04); }
+    .place-card::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.1), transparent 28%, transparent 72%, rgba(0,0,0,.25)),
+        #12100e url("images/game/zeal-card-back.png") center/cover no-repeat;
+      backface-visibility:hidden;
+      transform:rotateY(0deg);
+      transition:transform .48s cubic-bezier(.2,.75,.2,1);
+    }
+    .place-card.is-selected::after { transform:rotateY(-180deg); }
+@keyframes match-and-leave {
+  0% { opacity:1; transform:translateY(0) scale(1); filter:brightness(1); }
+  20% { opacity:1; transform:translateY(-7px) scale(1.1) rotate(.7deg); border-color:#fff0bd; box-shadow:0 0 12px rgba(255,245,202,.98), 0 0 58px rgba(245,162,42,.92), 0 20px 40px rgba(0,0,0,.5); filter:brightness(1.55) saturate(1.35); }
+  42% { opacity:1; transform:translateY(0) scale(1.04); filter:brightness(1.9) saturate(1.2); }
+  68% { opacity:.92; transform:translateY(10px) scale(.9); filter:brightness(1.9) saturate(1.1); }
+  100% { opacity:0; transform:translateY(48px) scale(.48); filter:brightness(2.4); }
+}
+    @keyframes match-flare {
+      0% { opacity:0; transform:scale(.3); }
+      20% { opacity:1; }
+      72% { opacity:.84; transform:scale(1); }
+      100% { opacity:0; transform:scale(1.28); }
+    }
+    @media (max-width:760px) {
+      .game-shell { width:calc(100% - 16px); padding:8px 0; }
+      .scoreboard { top:8px; margin-bottom:8px; }
+      .back-button { top:8px; left:8px; padding:10px 12px; font-size:10px; }
+      .place-wall { gap:5px; }
+      .place-card:hover, .place-card:focus-visible { transform:translateY(-2px) scale(1.015); }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; } }
+  </style>
+</head>
+<body>
+  <button class="back-button" id="backButton" type="button" aria-label="Return to the previous page">← Back</button>
+  <section class="game-intro" id="gameIntro" aria-labelledby="gameTitle">
+    <div class="intro-card">
+      <p class="intro-kicker">ZEAL memory challenge</p>
+      <h1 id="gameTitle">Find the pairs.</h1>
+      <p>记住十个地点，翻出两张相同的地点卡牌。你只有 30 秒。</p>
+      <ol class="rule-list">
+        <li><b>01</b><span>每次只能翻开两张卡牌。</span></li>
+        <li><b>02</b><span>找到相同地点即可得 1 分，该组卡牌会消失。</span></li>
+      <li><b>03</b><span>按 Start Game 后，先用 5 秒记住所有地点；卡牌翻回后，30 秒倒计时开始。</span></li>
+      </ol>
+      <button class="start-button" id="startButton" type="button">Start game — 30s</button>
+    </div>
+  </section>
+  <main class="game-shell" id="gameShell" aria-label="Place matching game" hidden>
+    <div class="scoreboard" aria-live="polite"><span>Matching score</span><strong id="score">0 / 10</strong><span>Time remaining</span><strong class="time-value" id="timer">00:30</strong></div>
+    <section class="place-wall" aria-label="Twenty place cards">
+    <button class="place-card" type="button" aria-label="Merdeka 118"><img src="images/game/game-merdeka-118.png" alt="Merdeka 118 at sunset"></button>
+    <button class="place-card" type="button" aria-label="Genting Highlands"><img src="images/game/game-genting-skyline.png" alt="Genting Highlands at sunset"></button>
+    <button class="place-card" type="button" aria-label="Genting Highlands clouds"><img src="images/game/game-genting-clouds.png" alt="Genting Highlands above the clouds"></button>
+    <button class="place-card" type="button" aria-label="Langkawi Sky Bridge"><img src="images/game/game-langkawi-sky-bridge.png" alt="Langkawi Sky Bridge at sunset"></button>
+    <button class="place-card" type="button" aria-label="Kota Kinabalu"><img src="images/game/game-kota-kinabalu.png" alt="Kota Kinabalu waterfront at sunset"></button>
+    <button class="place-card" type="button" aria-label="Cameron Highlands"><img src="images/game/game-cameron-highlands.png" alt="Cameron Highlands tea fields"></button>
+    <button class="place-card" type="button" aria-label="Putra Mosque"><img src="images/game/game-putra-mosque.png" alt="Putra Mosque at sunset"></button>
+    <button class="place-card" type="button" aria-label="Merdeka Square"><img src="images/game/game-merdeka-square.png" alt="Merdeka Square at sunset"></button>
+    <button class="place-card" type="button" aria-label="Batu Caves"><img src="images/game/game-batu-caves.png" alt="Batu Caves at sunset"></button>
+    <button class="place-card" type="button" aria-label="Petronas Twin Towers"><img src="images/game/game-petronas-towers.png" alt="Petronas Twin Towers at sunset"></button>
+    <button class="place-card" type="button" aria-label="Merdeka 118"><img src="images/game/game-merdeka-118.png" alt="Merdeka 118 at sunset"></button>
+    <button class="place-card" type="button" aria-label="Genting Highlands"><img src="images/game/game-genting-skyline.png" alt="Genting Highlands at sunset"></button>
+    <button class="place-card" type="button" aria-label="Genting Highlands clouds"><img src="images/game/game-genting-clouds.png" alt="Genting Highlands above the clouds"></button>
+    <button class="place-card" type="button" aria-label="Langkawi Sky Bridge"><img src="images/game/game-langkawi-sky-bridge.png" alt="Langkawi Sky Bridge at sunset"></button>
+    <button class="place-card" type="button" aria-label="Kota Kinabalu"><img src="images/game/game-kota-kinabalu.png" alt="Kota Kinabalu waterfront at sunset"></button>
+    <button class="place-card" type="button" aria-label="Cameron Highlands"><img src="images/game/game-cameron-highlands.png" alt="Cameron Highlands tea fields"></button>
+    <button class="place-card" type="button" aria-label="Putra Mosque"><img src="images/game/game-putra-mosque.png" alt="Putra Mosque at sunset"></button>
+    <button class="place-card" type="button" aria-label="Merdeka Square"><img src="images/game/game-merdeka-square.png" alt="Merdeka Square at sunset"></button>
+    <button class="place-card" type="button" aria-label="Batu Caves"><img src="images/game/game-batu-caves.png" alt="Batu Caves at sunset"></button>
+    <button class="place-card" type="button" aria-label="Petronas Twin Towers"><img src="images/game/game-petronas-towers.png" alt="Petronas Twin Towers at sunset"></button>
+    </section>
+  </main>
+  <section class="game-result" id="gameResult" aria-live="polite" hidden>
+    <div class="intro-card">
+      <p class="intro-kicker">Round complete</p>
+      <h1 id="resultTitle">Time's up.</h1>
+      <p id="resultText">You found 0 of 10 pairs.</p>
+      <button class="restart-button" id="restartButton" type="button">Play again</button>
+    </div>
+  </section>
+  <script>
+    const backButton = document.querySelector('#backButton');
+    backButton.addEventListener('click', () => {
+      let hasLeft = false;
+      window.addEventListener('pagehide', () => { hasLeft = true; }, { once: true });
+      window.history.back();
+      window.setTimeout(() => {
+        if (!hasLeft) window.location.href = 'index.html';
+      }, 360);
+    });
+
+    const cards = [...document.querySelectorAll('.place-card')];
+    const cardWall = document.querySelector('.place-wall');
+    const scoreDisplay = document.querySelector('#score');
+    const timerDisplay = document.querySelector('#timer');
+    const gameIntro = document.querySelector('#gameIntro');
+    const gameShell = document.querySelector('#gameShell');
+    const gameResult = document.querySelector('#gameResult');
+    const startButton = document.querySelector('#startButton');
+    const restartButton = document.querySelector('#restartButton');
+    const resultTitle = document.querySelector('#resultTitle');
+    const resultText = document.querySelector('#resultText');
+    const matchSound = new Audio('assets/audio/match-kaching.mp3');
+    matchSound.preload = 'auto';
+    matchSound.volume = 0.2;
+    let selected = [];
+    let score = 0;
+    let locked = false;
+    let timeLeft = 30;
+    let timerId;
+
+    cards.forEach((card) => {
+      card.dataset.place = card.querySelector('img').getAttribute('src');
+      card.addEventListener('click', () => chooseCard(card));
+    });
+
+    function chooseCard(card) {
+      if (locked || card.hidden || card.classList.contains('is-selected')) return;
+      card.classList.add('is-selected');
+      selected.push(card);
+      if (selected.length !== 2) return;
+
+      locked = true;
+      const [first, second] = selected;
+      if (first.dataset.place === second.dataset.place) {
+        score += 1;
+        scoreDisplay.textContent = `${score} / 10`;
+        matchSound.currentTime = 0;
+        matchSound.play().catch(() => {});
+        first.classList.add('is-matched');
+        second.classList.add('is-matched');
+        window.setTimeout(() => {
+          first.hidden = true;
+          second.hidden = true;
+          selected = [];
+          locked = false;
+          if (score === 10) finishGame(true);
+        }, 890);
+      } else {
+        window.setTimeout(() => {
+          first.classList.remove('is-selected');
+          second.classList.remove('is-selected');
+          selected = [];
+          locked = false;
+        }, 650);
+      }
+    }
+
+    function updateTimer() {
+      timerDisplay.textContent = `00:${String(timeLeft).padStart(2, '0')}`;
+    }
+
+    function shuffleCards() {
+      const shuffled = [...cards];
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+      }
+      cardWall.append(...shuffled);
+    }
+
+    function startGame() {
+      clearInterval(timerId);
+      score = 0;
+      timeLeft = 30;
+      selected = [];
+      locked = true;
+      scoreDisplay.textContent = '0 / 10';
+      updateTimer();
+      cards.forEach((card) => {
+        card.hidden = false;
+        card.classList.remove('is-selected', 'is-matched');
+      });
+      shuffleCards();
+      gameIntro.hidden = true;
+      gameResult.hidden = true;
+      gameShell.hidden = false;
+      cards.forEach((card) => card.classList.add('is-selected'));
+
+      window.setTimeout(() => {
+        cards.forEach((card) => card.classList.remove('is-selected'));
+        locked = false;
+        timerId = window.setInterval(() => {
+          timeLeft -= 1;
+          updateTimer();
+          if (timeLeft <= 0) finishGame(false);
+        }, 1000);
+      }, 5000);
+    }
+
+    function finishGame(completed) {
+      clearInterval(timerId);
+      locked = true;
+      selected.forEach((card) => card.classList.remove('is-selected'));
+      selected = [];
+      resultTitle.textContent = completed ? 'Perfect match.' : "Time's up.";
+      resultText.textContent = `You found ${score} of 10 pairs.`;
+      gameResult.hidden = false;
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+  </script>
+  <script src="js/background-music.js?v=game-music-0-3"></script>
+</body>
+</html>

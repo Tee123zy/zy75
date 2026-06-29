@@ -1,0 +1,31 @@
+.portfolio-note {
+  max-width: 960px;
+  margin: 0 0 44px;
+  padding: 17px 20px;
+  border-left: 2px solid var(--gold);
+  background: #151513;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  animation: portfolio-note-drift 7s ease-in-out infinite alternate;
+}
+
+.portfolio-note p { margin: 0; }
+.portfolio-note p + p { margin-top: 12px; }
+.portfolio-note strong { color: var(--bone); font-weight: 500; }
+
+@keyframes portfolio-note-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(42px); }
+}
+
+@media (max-width: 760px) {
+  .portfolio-note { margin-bottom: 32px; padding: 15px 16px; font-size: 11px; }
+  @keyframes portfolio-note-drift {
+    to { transform: translateX(14px); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-note { animation: none; }
+}
