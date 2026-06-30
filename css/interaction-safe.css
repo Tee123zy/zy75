@@ -538,3 +538,77 @@ nav a,
     grid-template-columns: 1fr;
   }
 }
+
+body {
+  font-family: 'DM Sans', 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
+}
+
+:lang(zh),
+.hero-zh,
+.lede-zh,
+.zh-line,
+.story-zh,
+.quick-links small,
+.services small,
+.terms-copy h4,
+.terms-copy .term-line,
+.terms-check {
+  font-family: 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
+  letter-spacing: 0;
+}
+
+.contact-mail.contact-mail-split {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.contact-mail.contact-mail-split span {
+  float: none;
+}
+
+.contact-mail-lines {
+  display: grid;
+  gap: 6px;
+  line-height: 1.08;
+}
+
+.contact-mail-lines span:last-child {
+  font-family: 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
+  font-size: .72em;
+  letter-spacing: 0;
+}
+
+.contact-mail-arrow {
+  flex: 0 0 auto;
+}
+
+.intro .intro-zh-lockup {
+  display: grid;
+  gap: 8px;
+  margin-top: clamp(18px, 2.6vw, 34px);
+  padding: 14px 0 14px clamp(18px, 2.4vw, 28px);
+  border-left: 2px solid var(--gold);
+  color: #cbb47f;
+  font-family: 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
+  font-size: clamp(18px, 1.8vw, 27px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: .04em;
+}
+
+.intro .intro-zh-lockup span {
+  display: block;
+}
+
+.intro .intro-zh-lockup span:first-child {
+  color: #efe4c8;
+}
+
+.intro > p:not(.eyebrow) .zh-line {
+  margin-top: 18px;
+  font-size: clamp(17px, 1.25vw, 21px);
+  line-height: 1.85;
+  color: #cfc8ba;
+}

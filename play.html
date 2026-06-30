@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZEAL — Places</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root { --paper:#11100f; --line:rgba(255,184,63,.45); --glow:#f5a22a; }
     * { box-sizing:border-box; }
@@ -14,7 +16,7 @@
       background:
         radial-gradient(circle at 50% 0%, rgba(242,146,30,.18), transparent 42%),
         #0b0b0a;
-      font-family:Arial,Helvetica,sans-serif;
+      font-family:Arial,'Noto Sans TC','Noto Sans SC','PingFang TC','PingFang SC',Helvetica,sans-serif;
     }
     .game-shell {
       width:min(1440px, calc(100% - 44px));
@@ -44,6 +46,7 @@
     }
     .intro-kicker { margin:0 0 12px; color:#e9a844; font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; }
     .intro-card h1 { margin:0; font:400 clamp(35px, 7vw, 64px)/.95 Georgia,serif; letter-spacing:.03em; }
+    .zh-line { display:block; margin-top:10px; font-family:'Noto Sans TC','Noto Sans SC','PingFang TC','PingFang SC',sans-serif; font-size:.48em; line-height:1.35; letter-spacing:0; }
     .intro-card > p:not(.intro-kicker) { max-width:400px; margin:18px auto 26px; color:#e8d7bb; font-size:15px; line-height:1.65; }
     .rule-list { display:grid; gap:10px; margin:0 0 28px; padding:0; list-style:none; text-align:left; }
     .rule-list li { display:flex; gap:12px; align-items:flex-start; padding:11px 0; border-top:1px solid rgba(255,184,63,.2); color:#eddcc1; font-size:13px; line-height:1.5; }
@@ -223,18 +226,18 @@
   </style>
 </head>
 <body>
-  <button class="back-button" id="backButton" type="button" aria-label="Return to the previous page">← Back</button>
+  <button class="back-button" id="backButton" type="button" aria-label="Return to the previous page">← Back 返回</button>
   <section class="game-intro" id="gameIntro" aria-labelledby="gameTitle">
     <div class="intro-card">
-      <p class="intro-kicker">ZEAL memory challenge</p>
-      <h1 id="gameTitle">Find the pairs.</h1>
+      <p class="intro-kicker">ZEAL memory challenge / ZEAL 记忆挑战</p>
+      <h1 id="gameTitle">Find the pairs.<span class="zh-line">找出相同的卡牌。</span></h1>
       <p>记住十个地点，翻出两张相同的地点卡牌。你只有 30 秒。</p>
       <ol class="rule-list">
         <li><b>01</b><span>每次只能翻开两张卡牌。</span></li>
         <li><b>02</b><span>找到相同地点即可得 1 分，该组卡牌会消失。</span></li>
       <li><b>03</b><span>按 Start Game 后，先用 5 秒记住所有地点；卡牌翻回后，30 秒倒计时开始。</span></li>
       </ol>
-      <button class="start-button" id="startButton" type="button">Start game — 30s</button>
+      <button class="start-button" id="startButton" type="button">Start game — 30s 开始游戏</button>
     </div>
   </section>
   <main class="game-shell" id="gameShell" aria-label="Place matching game" hidden>
@@ -264,10 +267,10 @@
   </main>
   <section class="game-result" id="gameResult" aria-live="polite" hidden>
     <div class="intro-card">
-      <p class="intro-kicker">Round complete</p>
-      <h1 id="resultTitle">Time's up.</h1>
-      <p id="resultText">You found 0 of 10 pairs.</p>
-      <button class="restart-button" id="restartButton" type="button">Play again</button>
+      <p class="intro-kicker">Round complete / 游戏结束</p>
+      <h1 id="resultTitle">Time's up.<span class="zh-line">时间到。</span></h1>
+      <p id="resultText">You found 0 of 10 pairs. 你找到了 0 / 10 组。</p>
+      <button class="restart-button" id="restartButton" type="button">Play again 再玩一次</button>
     </div>
   </section>
   <script>
@@ -385,8 +388,8 @@
       locked = true;
       selected.forEach((card) => card.classList.remove('is-selected'));
       selected = [];
-      resultTitle.textContent = completed ? 'Perfect match.' : "Time's up.";
-      resultText.textContent = `You found ${score} of 10 pairs.`;
+      resultTitle.innerHTML = completed ? 'Perfect match.<span class="zh-line">全部配对成功。</span>' : "Time's up.<span class=\"zh-line\">时间到。</span>";
+      resultText.textContent = `You found ${score} of 10 pairs. 你找到了 ${score} / 10 组。`;
       gameResult.hidden = false;
     }
 
