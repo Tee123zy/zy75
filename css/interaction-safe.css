@@ -498,12 +498,28 @@ nav a,
   display: grid;
   place-items: center;
   background: rgba(28, 28, 26, .72);
+  animation: rental-empty-float 3.8s ease-in-out infinite;
+  box-shadow: 0 0 22px rgba(185, 154, 98, .14);
+  will-change: transform, box-shadow;
 }
 
 .rental-empty h3 {
   color: var(--gold);
   font-size: clamp(28px, 4vw, 54px);
   letter-spacing: 0;
+  text-shadow: 0 0 16px rgba(215, 181, 103, .24);
+}
+
+@keyframes rental-empty-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    box-shadow: 0 0 18px rgba(185, 154, 98, .12);
+  }
+
+  50% {
+    transform: translate3d(0, -14px, 0) scale(1.018);
+    box-shadow: 0 14px 36px rgba(185, 154, 98, .2);
+  }
 }
 
 @media (max-width: 760px) {
