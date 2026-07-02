@@ -634,7 +634,7 @@ body {
   --font-display: 'DM Sans', 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
   --font-serif: 'Playfair Display', 'Noto Serif TC', 'Noto Sans TC', serif;
   --font-zh: 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
-  --font-zh-title: 'Noto Serif TC', 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', serif;
+  --font-zh-title: 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', sans-serif;
 }
 
 body {
@@ -1125,4 +1125,33 @@ footer {
     font-size: 15px;
     line-height: 1.45;
   }
+}
+
+/* One Traditional-Chinese capable font across all Chinese copy */
+:root {
+  --zeal-chinese-font: 'Noto Sans TC', 'Noto Sans SC', 'PingFang TC', 'PingFang SC', 'Microsoft JhengHei', sans-serif;
+  --font-zh: var(--zeal-chinese-font);
+  --font-zh-title: var(--zeal-chinese-font);
+}
+
+:lang(zh),
+:lang(zh-Hans),
+:lang(zh-Hant),
+.hero-zh,
+.lede-zh,
+.zh-line,
+.story-zh,
+.intro-zh-lockup,
+.quick-links small,
+.services small,
+.terms-copy h4,
+.terms-copy .term-line,
+.terms-check,
+.contact-mail-lines span:last-child,
+[lang="zh"],
+[lang="zh-Hans"],
+[lang="zh-Hant"] {
+  font-family: var(--zeal-chinese-font) !important;
+  font-weight: var(--zeal-zh-weight, 500);
+  letter-spacing: 0;
 }
