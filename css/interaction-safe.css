@@ -671,6 +671,18 @@ h2 em {
   font-style: italic;
 }
 
+.hero h1,
+.hero h1 .hero-title-line {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.hero h1 .hero-title-line {
+  display: inline;
+}
+
 :lang(zh),
 .hero-zh,
 .lede-zh,
