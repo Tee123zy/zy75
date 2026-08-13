@@ -56,13 +56,8 @@ export default async function handler(req, res) {
     });
     return page(res, 200, '已加入日历',
       e.name + ' · ' + e.date + '　已建立活动。', data.htmlLink);
- } catch (err) {
-    console.error('GCAL_ERROR', JSON.stringify({
-      message: err.message,
-      code: err.code,
-      errors: err.errors,
-      data: err.response && err.response.data,
-    }));
+  } catch (err) {
+    console.error('GCAL_ERROR', err && err.message, JSON.stringify(err && err.errors || null));
     return page(res, 502, '写入失败', '请稍后再按一次，或手动加入日历。');
   }
-
+}
