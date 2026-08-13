@@ -1,0 +1,8 @@
+{
+  "name": "zy75",
+  "private": true,
+  "dependencies": {
+    "googleapis": "^144.0.0",
+    "resend": "^4.0.0"
+  }
+}
