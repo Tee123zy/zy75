@@ -54,6 +54,7 @@ export default async function handler(req, res) {
 
     return page(res, 200, '已加入日历', e.name + ' · ' + e.date + ' 已建立活动。', data.htmlLink);
   } catch (err) {
-    return page(res, 500, '出错了', String(err && err.message || err));
+    console.error('GCAL_ERROR', err && err.message);
+    return page(res, 500, '出错了', '请稍后再按一次，或手动加入日历。');
   }
-}
+   }
