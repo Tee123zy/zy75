@@ -217,7 +217,7 @@ nav a,
 .archive-grid .archive-card,
 .portfolio-group-grid .archive-card {
   aspect-ratio: 3 / 4;
-  min-height: 0 !important;
+  min-height: 200px !important;
 }
 
 .work-grid .project img,
@@ -454,7 +454,7 @@ nav a,
 
 .archive-grid.archive-grid-video-all .archive-card:nth-child(n) {
   grid-column: auto;
-  min-height: 0 !important;
+  min-height: 200px !important;
 }
 
 .archive-card.photo-card:nth-child(3n+2) {
@@ -533,7 +533,7 @@ nav a,
   .archive-grid.archive-grid-video-all .archive-card:nth-child(n) {
     grid-column: auto;
     margin-top: 0;
-    min-height: 0 !important;
+    min-height: 200px !important;
   }
 
   .work-grid {
